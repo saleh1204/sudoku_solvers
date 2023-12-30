@@ -1,0 +1,18 @@
+{
+  "name": "sudoku_solver",
+  "version": "1.0.0",
+  "description": "Solve Sudoku Games",
+  "main": "index.js",
+  "scripts": {
+    "run": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "sudoku"
+  ],
+  "author": "Saleh AlSaleh",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "deasync": "^0.1.29"
+  }
+}
