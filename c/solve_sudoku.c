@@ -66,7 +66,8 @@ void get_empty_cell(int **matrix, int *row, int *col) {
   return;
 }
 
-int *get_possible_values(int **matrix, int row, int col, int *len) {
+void get_possible_values(int **matrix, int row, int col, int *values,
+                         int *len) {
   int values_array[9] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
   int length = 9;
   int *currentRow = matrix[row];
@@ -113,7 +114,6 @@ int *get_possible_values(int **matrix, int row, int col, int *len) {
       }
     }
   }
-  int *values = (int *)malloc(sizeof(int) * length);
   int valuesIndex = 0;
   for (int i = 0; i < 9; i++) {
     if (values_array[i] > 0) {
@@ -122,7 +122,6 @@ int *get_possible_values(int **matrix, int row, int col, int *len) {
     }
   }
   *len = length;
-  return values;
 }
 
 int **solve_sudoku(int **matrix) {
@@ -133,10 +132,10 @@ int **solve_sudoku(int **matrix) {
     return matrix;
   }
   int len = 0;
-  int *possible_values = get_possible_values(matrix, row, col, &len);
+  int possible_values[9];
+  get_possible_values(matrix, row, col, possible_values, &len);
   if (len == 0) {
     // solution does not exist for this matrix, backtrack
-    free(possible_values);
     return NULL;
   }
   for (int i = 0; i < len; i++) {
@@ -144,12 +143,10 @@ int **solve_sudoku(int **matrix) {
     matrix[row][col] = value;
     int **solution = solve_sudoku(matrix);
     if (solution != NULL) {
-      free(possible_values);
       return solution;
     }
     matrix[row][col] = 0;
   }
-  free(possible_values);
   return NULL;
 }
 int compare(const FTSENT **one, const FTSENT **two) {
