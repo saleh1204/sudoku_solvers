@@ -24,10 +24,10 @@
 			UTF-8
 		</project.build.sourceEncoding>
 		<maven.compiler.source>
-			11
+			21
 		</maven.compiler.source>
 		<maven.compiler.target>
-			11
+			21
 		</maven.compiler.target>
 	</properties>
 	<dependencies>
