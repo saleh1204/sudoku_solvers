@@ -5,12 +5,13 @@
 
 #define GAME_WIDTH 25
 #define GAME_HEIGHT 13
+#define ERROR_LINE 5
 
 int **matrix;
 bool **locked;
 
 int x, y;
-int selected_row = 0, selected_col = 0;
+uint8_t selected_row = 0, selected_col = 0;
 int **read_sudoku(const char *filename) {
   FILE *file = fopen(filename, "r");
   if (file == NULL) {
@@ -99,10 +100,11 @@ void initWindow(WINDOW *main_win) {
   start_color();
 
   /* Initialize all the colors */
-  init_pair(1, COLOR_RED, COLOR_BLACK);
+  init_pair(1, COLOR_WHITE, COLOR_RED);
   init_pair(2, COLOR_GREEN, COLOR_BLACK);
   init_pair(3, COLOR_BLUE, COLOR_BLACK);
   init_pair(4, COLOR_CYAN, COLOR_BLACK);
+  init_pair(5, COLOR_WHITE, COLOR_BLUE);
 
   box(main_win, 0, 0);
 }
@@ -121,8 +123,10 @@ void drawInstructions(WINDOW *main_win) {
 void updateXY(WINDOW *main_win) {
   char coordinates_str[80];
   attron(A_BOLD);
+  attron(COLOR_PAIR(5));
   snprintf(coordinates_str, 80, "x: %d y: %d", selected_row, selected_col);
   mvwaddstr(main_win, LINES - 2, (COLS / 2) - 5, coordinates_str);
+  attroff(COLOR_PAIR(5));
   attroff(A_BOLD);
   refresh();
 }
@@ -130,14 +134,8 @@ void updateXY(WINDOW *main_win) {
 void drawGameBorder(WINDOW *main_win, WINDOW *child_win, const char *filename) {
   matrix = read_sudoku(filename);
   if (child_win == NULL) {
-    // attron(COLOR_PAIR(1));
-    // mvwaddstr(main_win, 4, 1, "Error Creating new window");
-    // attroff(COLOR_PAIR(1));
     exit(1);
   } else {
-    // attron(COLOR_PAIR(3));
-    // mvwaddstr(main_win, 4, 1, "window Created Successfully!!");
-    // attroff(COLOR_PAIR(3));
     box(child_win, 0, 0);
     wrefresh(child_win);
   }
@@ -146,16 +144,17 @@ void drawGameBorder(WINDOW *main_win, WINDOW *child_win, const char *filename) {
 
 void showError(WINDOW *main_win, const char *msg) {
   attron(COLOR_PAIR(1));
-  mvwaddstr(main_win, 5, 1, msg);
+  mvwaddstr(main_win, ERROR_LINE, 1, msg);
   attroff(COLOR_PAIR(1));
   refresh();
 }
 void clearError(WINDOW *main_win) {
-  char msg[COLS - 1];
-  for (int i = 0; i < COLS - 2; i++) {
+  char msg[80];
+  for (int i = 0; i < 79; i++) {
     msg[i] = ' ';
   }
-  showError(main_win, msg);
+  mvwaddstr(main_win, ERROR_LINE, 1, msg);
+  // showError (main_win, msg);
 }
 void handleKeyStrokes(WINDOW *main_win, WINDOW *child_win) {
   int ch;
@@ -166,30 +165,22 @@ void handleKeyStrokes(WINDOW *main_win, WINDOW *child_win) {
     case KEY_DOWN:
     case 'k':
     case 'K':
-      if (selected_row != 8) {
-        selected_row++;
-      }
+      selected_row = (selected_row + 1) % 9;
       break;
     case KEY_UP:
     case 'i':
     case 'I':
-      if (selected_row != 0) {
-        selected_row--;
-      }
+      selected_row = (selected_row == 0) ? 8 : selected_row - 1;
       break;
     case KEY_RIGHT:
     case 'l':
     case 'L':
-      if (selected_col != 8) {
-        selected_col++;
-      }
+      selected_col = (selected_col + 1) % 9;
       break;
     case KEY_LEFT:
     case 'j':
     case 'J':
-      if (selected_col != 0) {
-        selected_col--;
-      }
+      selected_col = (selected_col == 0) ? 8 : selected_col - 1;
       break;
     case '1':
     case '2':
